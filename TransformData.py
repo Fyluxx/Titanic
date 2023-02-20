@@ -1,16 +1,20 @@
+from multiprocessing import Value
 import numpy as np
+import tensorflow as tf
 import math
-import sklearn as sk
+#import sklearn as sk
 import ReadFiles as rf
+import random
 
 #from sk.model_selection import train_test_split
 
 survivedCell = 1
-testSize = 0.3
+testSize = 0.2
+
 
 def SplitIntoXandY(data):
     x, y = [], []
-    
+
     arrLengthFirst = len(data)
     for i in range(arrLengthFirst):
         if i == 0:
@@ -19,36 +23,65 @@ def SplitIntoXandY(data):
         tup = ()
         for j in range(arrLengthSecond):
             if j == survivedCell:
-                y.append(data[i][j])
+                try:
+                    value = data[i][j]
+                except:
+                    print(value)
+                print(value)
+                y.append(data)
             else:
-                tup += (data[i][j],)
+                value = data[i][j]
+                if(type(value) != int):
+                    value = hash(value)
+                tup += (value,)
         x.append(tup)
 
-    return x,y
+    return x, y
 
-def SplitIntoTrainAndValidation(x,y, testSize):
-    x_Test, y_Test = [],[]
-    
+
+def SplitIntoTrainAndValidation(x, y, testSize):
+    x_Test, y_Test = [], []
+
     if(type(testSize) != float):
         raise("Testsize falscher Datentyp")
     if testSize > 1.0 or testSize < 0:
         raise("Testsize muss zwischen 0 und 1 sein")
-     
-    arrLength = len(x)    
-    testLength = int(math.round((arrLength * testSize))
-    
+
+    arrLength = len(x)
+    testLength = int(round((arrLength * testSize)))
+
     for i in range(testLength):
-        index = np.random(len(x))
+        index = random.randint(0, len(x) - 1)
         x_Test.append(x[index])
         y_Test.append(y[index])
         x.pop(index)
         y.pop(index)
-    
+
     return x, x_Test, y, y_Test
 
-x,y = SplitIntoXandY(rf.csvTrain)
-x_Train, x_Test, y_Train, y_Test = SplitIntoTrainAndValidation(x[0:4],y[0:4], testSize)
 
+x, y = SplitIntoXandY(rf.csvTrain)
+x_Train, x_Test, y_Train, y_Test = SplitIntoTrainAndValidation(x, y, testSize)
+
+model = tf.keras.models.Sequential([
+    tf.keras.layers.Dense(128, activation='relu',input_shape=(12,)),
+    tf.keras.layers.Dropout(0.2),
+    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dense(1, activation='sigmoid')
+])
+
+model.compile(optimizer='adam',
+              loss='binary_crossentropy',
+              metrics=['accuracy'])
+
+history = model.fit(x_Train, y_Train,
+                    epochs=10,
+                    batch_size=32,
+                    validation_data=(x_Test, y_Test))
+
+loss, accuracy = model.evaluate(x_Test, y_Test)
+#print('Test accuracy:', accuracy)
+print("dhfdshjkfhjdsfhjdshjkfdsjhkfdjhfhjdklsfhjkdlsjfhksd")
     
     
     
