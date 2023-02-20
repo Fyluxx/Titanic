@@ -1,16 +1,18 @@
 import numpy as np
 import math
-import sklearn as sk
+#import sklearn as sk
 import ReadFiles as rf
+import random
 
 #from sk.model_selection import train_test_split
 
 survivedCell = 1
-testSize = 0.3
+testSize = 0.99
+
 
 def SplitIntoXandY(data):
     x, y = [], []
-    
+
     arrLengthFirst = len(data)
     for i in range(arrLengthFirst):
         if i == 0:
@@ -24,31 +26,29 @@ def SplitIntoXandY(data):
                 tup += (data[i][j],)
         x.append(tup)
 
-    return x,y
+    return x, y
 
-def SplitIntoTrainAndValidation(x,y, testSize):
-    x_Test, y_Test = [],[]
-    
+
+def SplitIntoTrainAndValidation(x, y, testSize):
+    x_Test, y_Test = [], []
+
     if(type(testSize) != float):
         raise("Testsize falscher Datentyp")
     if testSize > 1.0 or testSize < 0:
         raise("Testsize muss zwischen 0 und 1 sein")
-     
-    arrLength = len(x)    
-    testLength = int(math.round((arrLength * testSize))
-    
+
+    arrLength = len(x)
+    testLength = int(round((arrLength * testSize)))
+
     for i in range(testLength):
-        index = np.random(len(x))
+        index = random.randint(0, len(x) - 1)
         x_Test.append(x[index])
         y_Test.append(y[index])
         x.pop(index)
         y.pop(index)
-    
+
     return x, x_Test, y, y_Test
 
-x,y = SplitIntoXandY(rf.csvTrain)
-x_Train, x_Test, y_Train, y_Test = SplitIntoTrainAndValidation(x[0:4],y[0:4], testSize)
 
-    
-    
-    
+x, y = SplitIntoXandY(rf.csvTrain)
+x_Train, x_Test, y_Train, y_Test = SplitIntoTrainAndValidation(x, y, testSize)
