@@ -5,24 +5,27 @@ import ReadFiles as rf
 #from sk.model_selection import train_test_split
 
 survivedCell = 1
-x, y = [], []
 
-arrLengthFirst = len(rf.csvTrain)
-for i in range(arrLengthFirst):
-    if i == 0:
-        continue
-    arrLengthSecond = len(rf.csvTrain[i])
-    tup = ()
-    for j in range(arrLengthSecond):
-        if j == survivedCell:
-            y.append(rf.csvTrain[i][j])
-        else:
-            tup += (rf.csvTrain[i][j],)
-    x.append(tup)
+def SplitIntoXandY(data):
+    x, y = [], []
+    
+    arrLengthFirst = len(data)
+    for i in range(arrLengthFirst):
+        if i == 0:
+            continue
+        arrLengthSecond = len(data[i])
+        tup = ()
+        for j in range(arrLengthSecond):
+            if j == survivedCell:
+                y.append(data[i][j])
+            else:
+                tup += (data[i][j],)
+        x.append(tup)
 
-print(len(x))
+    return x,y
 
-print(x)
+x,y = SplitIntoXandY(rf.csvTrain)
+
     
     
     
