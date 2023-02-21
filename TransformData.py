@@ -7,7 +7,6 @@ import ReadFiles as rf
 import random
 import zlib
 
-
 survivedCell = 1
 testSize = 0.2
 
@@ -55,7 +54,6 @@ def SplitIntoTrainAndValidation(x, y, testSize):
 
     return np.array(x), np.array(x_Test), np.array(y), np.array(y_Test)
 
-
 x, y = SplitIntoXandY(rf.csvTrain)
 x_Train, x_Test, y_Train, y_Test = SplitIntoTrainAndValidation(x, y, testSize)
 
@@ -65,8 +63,6 @@ model = tf.keras.models.Sequential([
     tf.keras.layers.Dense(64, activation='relu'),
     tf.keras.layers.Dense(1, activation='sigmoid')
 ])
-
-
 
 model.compile(optimizer='adam',
               loss='binary_crossentropy',
@@ -81,6 +77,3 @@ print(history.history['loss'])
 
 loss, accuracy = model.evaluate(x_Test, y_Test)
 print('Test accuracy:', accuracy)
-    
-    
-    
