@@ -9,7 +9,7 @@ import zlib
 from enum import IntEnum
 
 survivedCell = 1
-testSize = 0.4
+testSize = 0.05
 batch_size = 50
 
 
@@ -79,7 +79,7 @@ def SplitIntoXandY(data):
                 value = data[i][j]
                 value = CastData(value, j)
                 y.append(value)
-            else:
+            elif j != 3:
                 value = data[i][j]
                 value = CastData(value, j)
                 tup += (value,)
@@ -129,14 +129,10 @@ test_ds = test_ds.batch(batch_size)
 regulation = tf.keras.regularizers.l2(0.01)
 
 model = tf.keras.models.Sequential([
-    tf.keras.layers.Dense(1000, activation='relu',
+    tf.keras.layers.Dense(64, activation='relu',
                           kernel_regularizer=regulation),
-    tf.keras.layers.Dropout(0.4),
-    tf.keras.layers.Dense(500, activation='relu',
-                          kernel_regularizer=regulation),
-    tf.keras.layers.Dense(500, activation='relu',
-                          kernel_regularizer=regulation),
-    tf.keras.layers.Dense(16, activation='softmax',
+    tf.keras.layers.Dropout(0.3),
+    tf.keras.layers.Dense(16, activation='relu',
                           kernel_regularizer=regulation),
     tf.keras.layers.Dense(1, activation='sigmoid')
 ])
@@ -144,7 +140,6 @@ model = tf.keras.models.Sequential([
 model.compile(optimizer='adam',
               loss='binary_crossentropy',
               metrics=['accuracy'])
-
 model.fit(train_ds, epochs=500, validation_data=test_ds, verbose=1)
 
 loss, accuracy = model.evaluate(x_Test, y_Test)
