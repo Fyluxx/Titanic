@@ -9,7 +9,7 @@ import zlib
 from enum import IntEnum
 
 survivedCell = 1
-testSize = 0.05
+testSize = 0.1
 batch_size = 50
 
 
@@ -140,7 +140,7 @@ model = tf.keras.models.Sequential([
 model.compile(optimizer='adam',
               loss='binary_crossentropy',
               metrics=['accuracy'])
-model.fit(train_ds, epochs=500, validation_data=test_ds, verbose=1)
+model.fit(train_ds, epochs=1500, validation_data=test_ds, verbose=1)
 
 loss, accuracy = model.evaluate(x_Test, y_Test)
 print('Test accuracy:', accuracy)
