@@ -11,6 +11,15 @@ survivedCell = 1
 testSize = 0.4
 
 
+def CastData(data, type):
+   
+   
+   
+   
+   
+    return
+
+
 def SplitIntoXandY(data):
     x, y = [], []
 
@@ -27,8 +36,7 @@ def SplitIntoXandY(data):
                 y.append(value)
             else:
                 value = data[i][j]
-                if (type(value) != int or type(value) != float):
-                    value = zlib.crc32(value.encode()) & 0xffffffff
+                value = CastData(value, j)
                 tup += (value,)
         x.append(tup)
 
@@ -65,9 +73,11 @@ x, y = SplitIntoXandY(rf.csvTrain)
 x_Train, x_Test, y_Train, y_Test = SplitIntoTrainAndValidation(x, y, testSize)
 
 model = tf.keras.models.Sequential([
-    tf.keras.layers.Dense(64, activation='relu', input_shape=(11,)),
-    tf.keras.layers.Dropout(0.2),
-    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dense(1024, activation='relu', input_shape=(11,)),
+    tf.keras.layers.Dropout(0.4),
+    tf.keras.layers.Dense(512, activation='relu'),
+    tf.keras.layers.Dense(256, activation='relu'),
+    tf.keras.layers.Dense(128, activation='relu'),
     tf.keras.layers.Dense(1, activation='sigmoid')
 ])
 
@@ -76,7 +86,7 @@ model.compile(optimizer='adam',
               metrics=['accuracy'])
 
 history = model.fit(x_Train, y_Train,
-                    epochs=500,
+                    epochs=1500,
                     batch_size=50,
                     validation_data=(x_Test, y_Test),
                     verbose=1)
