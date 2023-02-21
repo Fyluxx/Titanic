@@ -6,18 +6,59 @@ import math
 import ReadFiles as rf
 import random
 import zlib
+from enum import Enum
 
 survivedCell = 1
 testSize = 0.4
 
 
+class Category(Enum):
+    Id = 0
+    Survived = 1
+    Pclass = 2
+    Name = 3
+    Sex = 4
+    Age = 5
+    SibSp = 6
+    Parch = 7
+    Ticket = 8
+    Fare = 9
+    Cabin = 10
+    Embarked = 11
+
+
+class Embarked(Enum):
+    C = 0
+    Q = 1
+    S = 2
+
+
+class Sex(Enum):
+    male = 0
+    female = 1
+
+
 def CastData(data, type):
-   
-   
-   
-   
-   
-    return
+    type = Category(type)
+    match type:
+        case Category.Id:
+            return int(data)
+        case Category.Survived:
+            return int(data)
+        case Category.Pclass:
+            return int(data)
+        case Category.Name:
+            return zlib.crc32(data.encode()) & 0xffffffff
+        case Category.Sex:
+            return int(Sex.data)
+        case Category.Age:
+            return int(data)
+        case Category.SibSp:
+        case Category.Parch:
+        case Category.Ticket:
+        case Category.Fare:
+        case Category.Cabin:
+        case Category.Embarked:
 
 
 def SplitIntoXandY(data):
@@ -36,14 +77,12 @@ def SplitIntoXandY(data):
                 y.append(value)
             else:
                 value = data[i][j]
-                value = CastData(value, j)
+                value = zlib.crc32(value.encode()) & 0xffffffff
+                CastData(value, j)
                 tup += (value,)
         x.append(tup)
 
     return x, y
-
-
-indexes = []
 
 
 def SplitIntoTrainAndValidation(x, y, testSize):
@@ -60,7 +99,6 @@ def SplitIntoTrainAndValidation(x, y, testSize):
     random.seed(100)
     for i in range(testLength):
         index = random.randint(0, len(x) - 1)
-        indexes.append(index)
         x_Test.append(x[index])
         y_Test.append(y[index])
         x.pop(index)
@@ -86,7 +124,7 @@ model.compile(optimizer='adam',
               metrics=['accuracy'])
 
 history = model.fit(x_Train, y_Train,
-                    epochs=1500,
+                    epochs=10,
                     batch_size=50,
                     validation_data=(x_Test, y_Test),
                     verbose=1)
