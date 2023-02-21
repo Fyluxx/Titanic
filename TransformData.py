@@ -52,9 +52,10 @@ def CastData(data, column):
         case Category.Sex:
             return int(Sex[data])
         case Category.Age:
-            if data == "":
+            try:
+                return int(round(float(data)))
+            except:
                 return 0
-            return int(round(float(data)))
         case Category.SibSp:
             return int(data)
         case Category.Parch:
@@ -66,7 +67,10 @@ def CastData(data, column):
         case Category.Cabin:
             return zlib.crc32(data.encode()) & 0xffffffff
         case Category.Embarked:
-            return int(Embarked[data])
+            try:
+                return int(Embarked[data])
+            except:
+                return 0
 
 
 def SplitIntoXandY(data):
@@ -121,8 +125,6 @@ model = tf.keras.models.Sequential([
     tf.keras.layers.Dense(1024, activation='relu', input_shape=(11,)),
     tf.keras.layers.Dropout(0.4),
     tf.keras.layers.Dense(512, activation='relu'),
-    tf.keras.layers.Dense(256, activation='relu'),
-    tf.keras.layers.Dense(128, activation='relu'),
     tf.keras.layers.Dense(1, activation='sigmoid')
 ])
 
@@ -131,8 +133,8 @@ model.compile(optimizer='adam',
               metrics=['accuracy'])
 
 history = model.fit(x_Train, y_Train,
-                    epochs=10,
-                    batch_size=50,
+                    epochs=2500,
+                    batch_size=250,
                     validation_data=(x_Test, y_Test),
                     verbose=1)
 print(history.history['loss'])
