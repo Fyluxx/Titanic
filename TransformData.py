@@ -10,6 +10,7 @@ from enum import IntEnum
 
 survivedCell = 1
 testSize = 0.4
+batch_size = 50
 
 
 class Category(IntEnum):
@@ -61,7 +62,7 @@ def CastData(data, column):
                 data = Embarked[data]
             except:
                 data = 0.0
-    return np.float16(float(data))
+    return np.float64(float(data))
 
 
 def SplitIntoXandY(data):
@@ -117,15 +118,26 @@ y_train_tf = tf.constant(y_Train)
 x_test_tf = tf.constant(x_Test)
 y_test_tf = tf.constant(y_Test)
 
+x_train_tf = tf.keras.utils.normalize(x_train_tf, axis=1)
+x_test_tf = tf.keras.utils.normalize(x_test_tf, axis=1)
+
 train_ds = tf.data.Dataset.from_tensor_slices((x_train_tf, y_train_tf))
+train_ds = train_ds.shuffle(buffer_size=10000).batch(batch_size)
 
 test_ds = tf.data.Dataset.from_tensor_slices((x_test_tf, y_test_tf))
+test_ds = test_ds.batch(batch_size)
+regulation = tf.keras.regularizers.l2(0.01)
 
 model = tf.keras.models.Sequential([
-    tf.keras.layers.Dense(5000, activation='relu'),
-    tf.keras.layers.Dropout(0.15),
-    tf.keras.layers.Dense(2500, activation='relu'),
-    tf.keras.layers.Dense(2500, activation='relu'),
+    tf.keras.layers.Dense(1000, activation='relu',
+                          kernel_regularizer=regulation),
+    tf.keras.layers.Dropout(0.4),
+    tf.keras.layers.Dense(500, activation='relu',
+                          kernel_regularizer=regulation),
+    tf.keras.layers.Dense(500, activation='relu',
+                          kernel_regularizer=regulation),
+    tf.keras.layers.Dense(16, activation='softmax',
+                          kernel_regularizer=regulation),
     tf.keras.layers.Dense(1, activation='sigmoid')
 ])
 
@@ -133,12 +145,7 @@ model.compile(optimizer='adam',
               loss='binary_crossentropy',
               metrics=['accuracy'])
 
-history = model.fit(train_ds,
-                    epochs=5000,
-                    batch_size=50,
-                    validation_data=test_ds,
-                    verbose=1)
-print(history.history['loss'])
+model.fit(train_ds, epochs=500, validation_data=test_ds, verbose=1)
 
 loss, accuracy = model.evaluate(x_Test, y_Test)
 print('Test accuracy:', accuracy)
