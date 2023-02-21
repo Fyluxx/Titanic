@@ -6,13 +6,13 @@ import math
 import ReadFiles as rf
 import random
 import zlib
-from enum import Enum
+from enum import IntEnum
 
 survivedCell = 1
 testSize = 0.4
 
 
-class Category(Enum):
+class Category(IntEnum):
     Id = 0
     Survived = 1
     Pclass = 2
@@ -27,20 +27,20 @@ class Category(Enum):
     Embarked = 11
 
 
-class Embarked(Enum):
+class Embarked(IntEnum):
     C = 0
     Q = 1
     S = 2
 
 
-class Sex(Enum):
+class Sex(IntEnum):
     male = 0
     female = 1
 
 
-def CastData(data, type):
-    type = Category(type)
-    match type:
+def CastData(data, column):
+    column = Category(column)
+    match column:
         case Category.Id:
             return int(data)
         case Category.Survived:
@@ -48,16 +48,13 @@ def CastData(data, type):
         case Category.Pclass:
             return int(data)
         case Category.Name:
-            try:
-                return zlib.crc32(data.encode()) & 0xffffffff
-            except:
-                print(data)
-            return 
+            return zlib.crc32(data.encode()) & 0xffffffff
         case Category.Sex:
-            print(str(int(Sex[data])) + "   sex")
             return int(Sex[data])
         case Category.Age:
-            return int(data)
+            if data == "":
+                return 0
+            return int(round(float(data)))
         case Category.SibSp:
             return int(data)
         case Category.Parch:
@@ -69,7 +66,6 @@ def CastData(data, type):
         case Category.Cabin:
             return zlib.crc32(data.encode()) & 0xffffffff
         case Category.Embarked:
-            print(str(int(Embarked[data])) + "  embarked")
             return int(Embarked[data])
 
 
@@ -89,8 +85,7 @@ def SplitIntoXandY(data):
                 y.append(value)
             else:
                 value = data[i][j]
-                value = zlib.crc32(value.encode()) & 0xffffffff
-                CastData(value, j)
+                value = CastData(value, j)
                 tup += (value,)
         x.append(tup)
 
