@@ -48,17 +48,29 @@ def CastData(data, type):
         case Category.Pclass:
             return int(data)
         case Category.Name:
-            return zlib.crc32(data.encode()) & 0xffffffff
+            try:
+                return zlib.crc32(data.encode()) & 0xffffffff
+            except:
+                print(data)
+            return 
         case Category.Sex:
-            return int(Sex.data)
+            print(str(int(Sex[data])) + "   sex")
+            return int(Sex[data])
         case Category.Age:
             return int(data)
         case Category.SibSp:
+            return int(data)
         case Category.Parch:
+            return int(data)
         case Category.Ticket:
+            return zlib.crc32(data.encode()) & 0xffffffff
         case Category.Fare:
+            return zlib.crc32(data.encode()) & 0xffffffff
         case Category.Cabin:
+            return zlib.crc32(data.encode()) & 0xffffffff
         case Category.Embarked:
+            print(str(int(Embarked[data])) + "  embarked")
+            return int(Embarked[data])
 
 
 def SplitIntoXandY(data):
