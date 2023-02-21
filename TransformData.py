@@ -41,36 +41,27 @@ class Sex(IntEnum):
 def CastData(data, column):
     column = Category(column)
     match column:
-        case Category.Id:
-            return int(data)
-        case Category.Survived:
-            return int(data)
-        case Category.Pclass:
-            return int(data)
         case Category.Name:
-            return zlib.crc32(data.encode()) & 0xffffffff
+            data = zlib.crc32(data.encode()) & 0xffffffff
         case Category.Sex:
-            return int(Sex[data])
+            data = Sex[data]
         case Category.Age:
             try:
-                return int(round(float(data)))
+                data = float(data)
             except:
-                return 0
-        case Category.SibSp:
-            return int(data)
-        case Category.Parch:
-            return int(data)
+                data = 0.0
         case Category.Ticket:
-            return zlib.crc32(data.encode()) & 0xffffffff
+            data = zlib.crc32(data.encode()) & 0xffffffff
         case Category.Fare:
-            return zlib.crc32(data.encode()) & 0xffffffff
+            data = zlib.crc32(data.encode()) & 0xffffffff
         case Category.Cabin:
-            return zlib.crc32(data.encode()) & 0xffffffff
+            data = zlib.crc32(data.encode()) & 0xffffffff
         case Category.Embarked:
             try:
-                return int(Embarked[data])
+                data = Embarked[data]
             except:
-                return 0
+                data = 0.0
+    return np.float16(float(data))
 
 
 def SplitIntoXandY(data):
@@ -85,7 +76,7 @@ def SplitIntoXandY(data):
         for j in range(arrLengthSecond):
             if j == survivedCell:
                 value = data[i][j]
-                value = int(value)
+                value = CastData(value, j)
                 y.append(value)
             else:
                 value = data[i][j]
@@ -121,10 +112,20 @@ def SplitIntoTrainAndValidation(x, y, testSize):
 x, y = SplitIntoXandY(rf.csvTrain)
 x_Train, x_Test, y_Train, y_Test = SplitIntoTrainAndValidation(x, y, testSize)
 
+x_train_tf = tf.constant(x_Train)
+y_train_tf = tf.constant(y_Train)
+x_test_tf = tf.constant(x_Test)
+y_test_tf = tf.constant(y_Test)
+
+train_ds = tf.data.Dataset.from_tensor_slices((x_train_tf, y_train_tf))
+
+test_ds = tf.data.Dataset.from_tensor_slices((x_test_tf, y_test_tf))
+
 model = tf.keras.models.Sequential([
-    tf.keras.layers.Dense(1024, activation='relu', input_shape=(11,)),
-    tf.keras.layers.Dropout(0.4),
-    tf.keras.layers.Dense(512, activation='relu'),
+    tf.keras.layers.Dense(5000, activation='relu'),
+    tf.keras.layers.Dropout(0.15),
+    tf.keras.layers.Dense(2500, activation='relu'),
+    tf.keras.layers.Dense(2500, activation='relu'),
     tf.keras.layers.Dense(1, activation='sigmoid')
 ])
 
@@ -132,10 +133,10 @@ model.compile(optimizer='adam',
               loss='binary_crossentropy',
               metrics=['accuracy'])
 
-history = model.fit(x_Train, y_Train,
-                    epochs=2500,
-                    batch_size=250,
-                    validation_data=(x_Test, y_Test),
+history = model.fit(train_ds,
+                    epochs=5000,
+                    batch_size=50,
+                    validation_data=test_ds,
                     verbose=1)
 print(history.history['loss'])
 
