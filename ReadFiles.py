@@ -13,5 +13,3 @@ with open("./Daten/test.csv", "r") as file:
     csvTest = [tuple(row) for row in csv.reader(file)]
 
 end = time.time()
-
-print(str(end-beginn) + "So lange hat das gedauert" + "\n\n\n")

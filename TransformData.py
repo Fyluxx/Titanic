@@ -7,9 +7,10 @@ import ReadFiles as rf
 import random
 import zlib
 from enum import IntEnum
+from xgboost import XGBClassifier
 
 survivedCell = 1
-testSize = 0.1
+testSize = 0.2
 batch_size = 50
 
 
@@ -79,7 +80,7 @@ def SplitIntoXandY(data):
                 value = data[i][j]
                 value = CastData(value, j)
                 y.append(value)
-            elif j != 3:
+            elif j != 3 and j != 8 and j != 10 and j != 9:
                 value = data[i][j]
                 value = CastData(value, j)
                 tup += (value,)
@@ -110,37 +111,62 @@ def SplitIntoTrainAndValidation(x, y, testSize):
     return np.array(x), np.array(x_Test), np.array(y), np.array(y_Test)
 
 
+def TrainWithNeuralNetwork():
+    x_train_tf = tf.constant(x_Train)
+    y_train_tf = tf.constant(y_Train)
+    x_test_tf = tf.constant(x_Test)
+    y_test_tf = tf.constant(y_Test)
+
+    x_train_tf = tf.keras.utils.normalize(x_train_tf, axis=1)
+    x_test_tf = tf.keras.utils.normalize(x_test_tf, axis=1)
+
+    train_ds = tf.data.Dataset.from_tensor_slices((x_train_tf, y_train_tf))
+    train_ds = train_ds.shuffle(buffer_size=10000).batch(batch_size)
+
+    test_ds = tf.data.Dataset.from_tensor_slices((x_test_tf, y_test_tf))
+    test_ds = test_ds.batch(batch_size)
+    regulation = tf.keras.regularizers.l2(0.01)
+
+    model = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(64, activation='relu',
+                              kernel_regularizer=regulation),
+        tf.keras.layers.Dropout(0.3),
+        tf.keras.layers.Dense(16, activation='relu',
+                              kernel_regularizer=regulation),
+        tf.keras.layers.Dense(1, activation='sigmoid')
+    ])
+
+    model.compile(optimizer='adam',
+                  loss='binary_crossentropy',
+                  metrics=['accuracy'])
+    model.fit(train_ds, epochs=1500, validation_data=test_ds, verbose=1)
+
+    loss, accuracy = model.evaluate(x_Test, y_Test)
+    print('Test accuracy:', accuracy)
+
+
+def TrainWithXGBoost():
+    bst = XGBClassifier(n_estimators=5000, max_depth=8,
+                        learning_rate=0.001, objective='binary:logistic',subsample=0.3)
+
+    eval_set = [(x_Train, y_Train), (x_Test, y_Test)]
+    bst.fit(x_Train, y_Train, early_stopping_rounds=15, eval_set=eval_set, verbose=True)
+
+    y_predictions = bst.predict(x_Test)
+    y_pred =[round(value) for value in y_predictions]
+
+    rightPredicts = 0
+    arrLength = len(y_pred)
+
+    for i in range(arrLength):
+        if y_pred[i] == y_Train[i]:
+            rightPredicts += 1
+
+    print("Score: " + str(rightPredicts / arrLength))
+
+
 x, y = SplitIntoXandY(rf.csvTrain)
 x_Train, x_Test, y_Train, y_Test = SplitIntoTrainAndValidation(x, y, testSize)
 
-x_train_tf = tf.constant(x_Train)
-y_train_tf = tf.constant(y_Train)
-x_test_tf = tf.constant(x_Test)
-y_test_tf = tf.constant(y_Test)
-
-x_train_tf = tf.keras.utils.normalize(x_train_tf, axis=1)
-x_test_tf = tf.keras.utils.normalize(x_test_tf, axis=1)
-
-train_ds = tf.data.Dataset.from_tensor_slices((x_train_tf, y_train_tf))
-train_ds = train_ds.shuffle(buffer_size=10000).batch(batch_size)
-
-test_ds = tf.data.Dataset.from_tensor_slices((x_test_tf, y_test_tf))
-test_ds = test_ds.batch(batch_size)
-regulation = tf.keras.regularizers.l2(0.01)
-
-model = tf.keras.models.Sequential([
-    tf.keras.layers.Dense(64, activation='relu',
-                          kernel_regularizer=regulation),
-    tf.keras.layers.Dropout(0.3),
-    tf.keras.layers.Dense(16, activation='relu',
-                          kernel_regularizer=regulation),
-    tf.keras.layers.Dense(1, activation='sigmoid')
-])
-
-model.compile(optimizer='adam',
-              loss='binary_crossentropy',
-              metrics=['accuracy'])
-model.fit(train_ds, epochs=1500, validation_data=test_ds, verbose=1)
-
-loss, accuracy = model.evaluate(x_Test, y_Test)
-print('Test accuracy:', accuracy)
+print("Beginnt lernen")
+TrainWithXGBoost()
