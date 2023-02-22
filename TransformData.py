@@ -16,7 +16,6 @@ batch_size = 50
 
 
 class Category(IntEnum):
-    Id = 0
     Survived = 1
     Pclass = 2
     Name = 3
@@ -76,7 +75,7 @@ def SplitIntoXandY(data):
             continue
         arrLengthSecond = len(data[i])
         tup = ()
-        for j in range(arrLengthSecond):
+        for j in range(1, arrLengthSecond):
             if j == survivedCell:
                 value = data[i][j]
                 value = CastData(value, j)
@@ -94,7 +93,18 @@ def ConvertDataToList(data):
     x = []
     arrLengthFirst = len(data)
 
-    for i in range(data)
+    for i in range(arrLengthFirst):
+        if i == 0:
+            continue
+        arrLengthSecond = len(data[i])
+        tup = ()
+        for j in range(1, arrLengthSecond):
+            k = j + 1
+            value = data[i][j]
+            value = CastData(value, k)
+            tup += (value,)
+        x.append(tup)
+    return x
 
 
 def SplitIntoTrainAndValidation(x, y, testSize):
@@ -210,6 +220,6 @@ x_Train, x_Test, y_Train, y_Test = SplitIntoTrainAndValidation(x, y, testSize)
 print("Beginnt lernen")
 TrainWithXGBoost()
 
-x_Predict =
+x_Predict = ConvertDataToList(rf.csvTest)
 print(x_Predict)
-PredictWithXGBoost(x_Predict)
+PredictWithXGBoost()
