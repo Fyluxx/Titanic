@@ -1,14 +1,11 @@
 from multiprocessing import Value
 from traceback import print_tb
 import numpy as np
-import tensorflow as tf
 import math
 import ReadFiles as rf
 import random
 import zlib
 from enum import IntEnum
-from xgboost import XGBClassifier
-
 
 survivedCell = 1
 testSize = 0.2
@@ -113,6 +110,8 @@ def SplitIntoTrainAndValidation(x, y, testSize):
 
 
 def TrainWithNeuralNetwork():
+    import tensorflow as tf
+
     x_train_tf = tf.constant(x_Train)
     y_train_tf = tf.constant(y_Train)
     x_test_tf = tf.constant(x_Test)
@@ -147,6 +146,8 @@ def TrainWithNeuralNetwork():
 
 
 def TrainWithXGBoost():
+    from xgboost import XGBClassifier
+
     bst = XGBClassifier(n_estimators=350, max_depth=12,
                         learning_rate=0.00025, objective='binary:logistic', subsample=0.3)
 
