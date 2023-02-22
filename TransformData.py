@@ -1,4 +1,5 @@
 from multiprocessing import Value
+from pickle import TRUE
 from traceback import print_tb
 import numpy as np
 import math
@@ -7,6 +8,7 @@ import random
 import zlib
 from xgboost import XGBClassifier
 from enum import IntEnum
+import csv
 
 survivedCell = 1
 testSize = 0.2
@@ -79,13 +81,20 @@ def SplitIntoXandY(data):
                 value = data[i][j]
                 value = CastData(value, j)
                 y.append(value)
-            elif j != 3 and j != 8 and j != 10 and j != 9:
+            else:
                 value = data[i][j]
                 value = CastData(value, j)
                 tup += (value,)
         x.append(tup)
 
     return x, y
+
+
+def ConvertDataToList(data):
+    x = []
+    arrLengthFirst = len(data)
+
+    for i in range(data)
 
 
 def SplitIntoTrainAndValidation(x, y, testSize):
@@ -148,7 +157,8 @@ def TrainWithNeuralNetwork():
 
 def TrainWithXGBoost():
 
-    bst = XGBClassifier(n_estimators=350, max_depth=12,
+    global bst
+    bst = XGBClassifier(n_estimators=350, max_depth=20,
                         learning_rate=0.00025, objective='binary:logistic', subsample=0.3)
 
     eval_set = [(x_Train, y_Train), (x_Test, y_Test)]
@@ -170,9 +180,36 @@ def TrainWithXGBoost():
     print("\n\n\n")
 
 
+def PredictWithXGBoost():
+    global y_pred
+
+    y_predictions = bst.predict(x_Predict)
+    y_pred = [round(value) for value in y_predictions]
+
+
+def ResultToCSV(result):
+    startPassengerID = 892
+    arrLength = len(result)
+    data = []
+
+    for i in range(arrLength):
+        data.append((startPassengerID + i, result[i]))
+
+    print(data)
+
+    with open('predictions', 'wb') as out:
+        csv_out = csv.writer(out)
+        for row in data:
+            csv_out.writerow(row)
+
+
 rf.GetData()
 x, y = SplitIntoXandY(rf.csvTrain)
 x_Train, x_Test, y_Train, y_Test = SplitIntoTrainAndValidation(x, y, testSize)
 
 print("Beginnt lernen")
 TrainWithXGBoost()
+
+x_Predict =
+print(x_Predict)
+PredictWithXGBoost(x_Predict)
