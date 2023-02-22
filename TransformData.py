@@ -168,7 +168,7 @@ def TrainWithNeuralNetwork():
 def TrainWithXGBoost():
 
     global bst
-    bst = XGBClassifier(n_estimators=350, max_depth=20,
+    bst = XGBClassifier(n_estimators=35000, max_depth=8,
                         learning_rate=0.00025, objective='binary:logistic', subsample=0.3)
 
     eval_set = [(x_Train, y_Train), (x_Test, y_Test)]
@@ -196,21 +196,22 @@ def PredictWithXGBoost():
     return y_pred
 
 
-
 def ResultToCSV(result):
     startPassengerID = 892
     arrLength = len(result)
     data = []
 
+    data.append(("PassengerId", "Survived"))
     for i in range(arrLength):
-        data.append((startPassengerID + i, result[i]))
+        data.append((startPassengerID + i, str(result[i])))
 
-    print(data)
+    itemLength = len(data[0])
 
-    with open('predictions', 'wb') as out:
-        csv_out = csv.writer(out)
+    with open('predictions.csv', 'w') as out:
+        csv_out = csv.writer(out, delimiter=",")
         for row in data:
-            csv_out.writerow(row)
+            st = row
+            csv_out.writerow(st)
 
 
 rf.GetData()
@@ -221,6 +222,5 @@ print("Beginnt lernen")
 TrainWithXGBoost()
 
 x_Predict = ConvertDataToList(rf.csvTest)
-print(x_Predict)
 result = PredictWithXGBoost()
 ResultToCSV(result)
