@@ -130,7 +130,7 @@ def CrossValidation(data):
     bucketsY = []
     x_Test, x_Train, y_Train, y_Test = [], [], [], []
 
-    random.seed(100)
+    random.seed(50)
     arrLength = len(data) // crossValidation
     remainder = (len(data) - 1) % crossValidation
     for i in range(crossValidation):
@@ -185,7 +185,6 @@ def CrossValidation(data):
             else:
                 x_Train.extend(bucketsX[j])
                 y_Train.extend(bucketsY[j])
-
         print("Durchlauf: " + str(i + 1))
         TrainWithXGBoost(x_Train, x_Test, y_Train, y_Test)
 
@@ -229,7 +228,7 @@ def TrainWithNeuralNetwork(x_Train, x_Test, y_Train, y_Test):
 def TrainWithXGBoost(x_Train, x_Test, y_Train, y_Test):
 
     global bst
-    bst = XGBClassifier(n_estimators=350, max_depth=8,
+    bst = XGBClassifier(n_estimators=50, max_depth=8,
                         learning_rate=0.00025, objective='binary:logistic', subsample=0.3)
 
     eval_set = [(x_Train, y_Train), (x_Test, y_Test)]
@@ -246,9 +245,7 @@ def TrainWithXGBoost(x_Train, x_Test, y_Train, y_Test):
         if y_pred[i] == y_Test[i]:
             rightPredicts += 1
 
-    print("\n\n\n")
     print("Score: " + str(rightPredicts / arrLength))
-    print("\n\n\n")
 
 
 def PredictWithXGBoost():
