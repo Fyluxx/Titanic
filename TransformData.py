@@ -9,6 +9,7 @@ import zlib
 from enum import IntEnum
 from xgboost import XGBClassifier
 
+
 survivedCell = 1
 testSize = 0.2
 batch_size = 50
@@ -146,11 +147,11 @@ def TrainWithNeuralNetwork():
 
 
 def TrainWithXGBoost():
-    bst = XGBClassifier(n_estimators=5000, max_depth=8,
-                        learning_rate=0.001, objective='binary:logistic', subsample=0.3)
+    bst = XGBClassifier(n_estimators=350, max_depth=12,
+                        learning_rate=0.00025, objective='binary:logistic', subsample=0.3)
 
     eval_set = [(x_Train, y_Train), (x_Test, y_Test)]
-    bst.fit(x_Train, y_Train, early_stopping_rounds=15,
+    bst.fit(x_Train, y_Train,
             eval_set=eval_set, verbose=True)
 
     y_predictions = bst.predict(x_Test)
@@ -160,12 +161,15 @@ def TrainWithXGBoost():
     arrLength = len(y_pred)
 
     for i in range(arrLength):
-        if y_pred[i] == y_Train[i]:
+        if y_pred[i] == y_Test[i]:
             rightPredicts += 1
 
+    print("\n\n\n")
     print("Score: " + str(rightPredicts / arrLength))
+    print("\n\n\n")
 
 
+rf.GetData()
 x, y = SplitIntoXandY(rf.csvTrain)
 x_Train, x_Test, y_Train, y_Test = SplitIntoTrainAndValidation(x, y, testSize)
 
