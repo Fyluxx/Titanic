@@ -152,6 +152,7 @@ def CrossValidation(data):
                     bucketsY[i].append(value)
                 else:
                     value = CastData(data[r][k], k)
+                    tup += (value,)
             bucketsX[i].append(tup)
             data.pop(r)
 
@@ -169,6 +170,7 @@ def CrossValidation(data):
                 bucketsY[i].append(value)
             else:
                 value = CastData(data[r][k], k)
+                tup += (value,)
         bucketsX[i].append(tup)
         data.pop(r)
 
@@ -183,8 +185,9 @@ def CrossValidation(data):
             else:
                 x_Train.extend(bucketsX[j])
                 y_Train.extend(bucketsY[j])
+
+        print("Durchlauf: " + str(i + 1))
         TrainWithXGBoost(x_Train, x_Test, y_Train, y_Test)
-        print("Das war dieser Durchlauf: " + str(i))
 
 
 def TrainWithNeuralNetwork(x_Train, x_Test, y_Train, y_Test):
