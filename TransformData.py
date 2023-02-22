@@ -191,10 +191,10 @@ def TrainWithXGBoost():
 
 
 def PredictWithXGBoost():
-    global y_pred
-
     y_predictions = bst.predict(x_Predict)
     y_pred = [round(value) for value in y_predictions]
+    return y_pred
+
 
 
 def ResultToCSV(result):
@@ -222,4 +222,5 @@ TrainWithXGBoost()
 
 x_Predict = ConvertDataToList(rf.csvTest)
 print(x_Predict)
-PredictWithXGBoost()
+result = PredictWithXGBoost()
+ResultToCSV(result)
