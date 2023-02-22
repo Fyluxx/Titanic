@@ -147,13 +147,14 @@ def TrainWithNeuralNetwork():
 
 def TrainWithXGBoost():
     bst = XGBClassifier(n_estimators=5000, max_depth=8,
-                        learning_rate=0.001, objective='binary:logistic',subsample=0.3)
+                        learning_rate=0.001, objective='binary:logistic', subsample=0.3)
 
     eval_set = [(x_Train, y_Train), (x_Test, y_Test)]
-    bst.fit(x_Train, y_Train, early_stopping_rounds=15, eval_set=eval_set, verbose=True)
+    bst.fit(x_Train, y_Train, early_stopping_rounds=15,
+            eval_set=eval_set, verbose=True)
 
     y_predictions = bst.predict(x_Test)
-    y_pred =[round(value) for value in y_predictions]
+    y_pred = [round(value) for value in y_predictions]
 
     rightPredicts = 0
     arrLength = len(y_pred)
