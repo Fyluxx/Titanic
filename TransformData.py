@@ -6,9 +6,63 @@ import math
 import ReadFiles as rf
 import random
 import zlib
+from enum import IntEnum
 
 survivedCell = 1
-testSize = 0.2
+testSize = 0.1
+batch_size = 50
+
+
+class Category(IntEnum):
+    Id = 0
+    Survived = 1
+    Pclass = 2
+    Name = 3
+    Sex = 4
+    Age = 5
+    SibSp = 6
+    Parch = 7
+    Ticket = 8
+    Fare = 9
+    Cabin = 10
+    Embarked = 11
+
+
+class Embarked(IntEnum):
+    C = 0
+    Q = 1
+    S = 2
+
+
+class Sex(IntEnum):
+    male = 0
+    female = 1
+
+
+def CastData(data, column):
+    column = Category(column)
+    match column:
+        case Category.Name:
+            data = zlib.crc32(data.encode()) & 0xffffffff
+        case Category.Sex:
+            data = Sex[data]
+        case Category.Age:
+            try:
+                data = float(data)
+            except:
+                data = 0.0
+        case Category.Ticket:
+            data = zlib.crc32(data.encode()) & 0xffffffff
+        case Category.Fare:
+            data = zlib.crc32(data.encode()) & 0xffffffff
+        case Category.Cabin:
+            data = zlib.crc32(data.encode()) & 0xffffffff
+        case Category.Embarked:
+            try:
+                data = Embarked[data]
+            except:
+                data = 0.0
+    return np.float64(float(data))
 
 
 def SplitIntoXandY(data):
@@ -23,11 +77,11 @@ def SplitIntoXandY(data):
         for j in range(arrLengthSecond):
             if j == survivedCell:
                 value = data[i][j]
+                value = CastData(value, j)
                 y.append(value)
-            else:
+            elif j != 3:
                 value = data[i][j]
-                if(type(value) != int):
-                    value = zlib.crc32(value.encode()) & 0xffffffff
+                value = CastData(value, j)
                 tup += (value,)
         x.append(tup)
 
@@ -37,14 +91,15 @@ def SplitIntoXandY(data):
 def SplitIntoTrainAndValidation(x, y, testSize):
     x_Test, y_Test = [], []
 
-    if(type(testSize) != float):
-        raise("Testsize falscher Datentyp")
+    if (type(testSize) != float):
+        raise ("Testsize falscher Datentyp")
     if testSize > 1.0 or testSize < 0:
-        raise("Testsize muss zwischen 0 und 1 sein")
+        raise ("Testsize muss zwischen 0 und 1 sein")
 
     arrLength = len(x)
     testLength = int(round((arrLength * testSize)))
 
+    random.seed(100)
     for i in range(testLength):
         index = random.randint(0, len(x) - 1)
         x_Test.append(x[index])
@@ -54,26 +109,38 @@ def SplitIntoTrainAndValidation(x, y, testSize):
 
     return np.array(x), np.array(x_Test), np.array(y), np.array(y_Test)
 
+
 x, y = SplitIntoXandY(rf.csvTrain)
 x_Train, x_Test, y_Train, y_Test = SplitIntoTrainAndValidation(x, y, testSize)
 
+x_train_tf = tf.constant(x_Train)
+y_train_tf = tf.constant(y_Train)
+x_test_tf = tf.constant(x_Test)
+y_test_tf = tf.constant(y_Test)
+
+x_train_tf = tf.keras.utils.normalize(x_train_tf, axis=1)
+x_test_tf = tf.keras.utils.normalize(x_test_tf, axis=1)
+
+train_ds = tf.data.Dataset.from_tensor_slices((x_train_tf, y_train_tf))
+train_ds = train_ds.shuffle(buffer_size=10000).batch(batch_size)
+
+test_ds = tf.data.Dataset.from_tensor_slices((x_test_tf, y_test_tf))
+test_ds = test_ds.batch(batch_size)
+regulation = tf.keras.regularizers.l2(0.01)
+
 model = tf.keras.models.Sequential([
-    tf.keras.layers.Dense(64, activation='relu',input_shape=(11,)),
-    tf.keras.layers.Dropout(0.2),
-    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dense(64, activation='relu',
+                          kernel_regularizer=regulation),
+    tf.keras.layers.Dropout(0.3),
+    tf.keras.layers.Dense(16, activation='relu',
+                          kernel_regularizer=regulation),
     tf.keras.layers.Dense(1, activation='sigmoid')
 ])
 
 model.compile(optimizer='adam',
               loss='binary_crossentropy',
               metrics=['accuracy'])
-
-history = model.fit(x_Train, y_Train,
-                    epochs=1,
-                    batch_size=1,
-                    validation_data=(x_Test, y_Test),
-                    verbose=1)
-print(history.history['loss'])
+model.fit(train_ds, epochs=1500, validation_data=test_ds, verbose=1)
 
 loss, accuracy = model.evaluate(x_Test, y_Test)
 print('Test accuracy:', accuracy)
