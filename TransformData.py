@@ -11,8 +11,9 @@ from enum import IntEnum
 import csv
 
 survivedCell = 1
-testSize = 0.2
 batch_size = 50
+testSize = 0.01
+crossValidation = 5
 
 
 class Category(IntEnum):
@@ -110,11 +111,6 @@ def ConvertDataToList(data):
 def SplitIntoTrainAndValidation(x, y, testSize):
     x_Test, y_Test = [], []
 
-    if (type(testSize) != float):
-        raise ("Testsize falscher Datentyp")
-    if testSize > 1.0 or testSize < 0:
-        raise ("Testsize muss zwischen 0 und 1 sein")
-
     arrLength = len(x)
     testLength = int(round((arrLength * testSize)))
 
@@ -129,7 +125,69 @@ def SplitIntoTrainAndValidation(x, y, testSize):
     return np.array(x), np.array(x_Test), np.array(y), np.array(y_Test)
 
 
-def TrainWithNeuralNetwork():
+def CrossValidation(data):
+    bucketsX = []
+    bucketsY = []
+    x_Test, x_Train, y_Train, y_Test = [], [], [], []
+
+    random.seed(100)
+    arrLength = len(data) // crossValidation
+    remainder = (len(data) - 1) % crossValidation
+    for i in range(crossValidation):
+        bucketsX.append([])
+        bucketsY.append([])
+
+        for j in range(arrLength):
+            arrLengthSecond = len(data[0])
+            tup = ()
+
+            r = random.randint(0, len(data) - 1)
+
+            while r == 0:
+                r = random.randint(0, len(data) - 1)
+
+            for k in range(1, arrLengthSecond):
+                if k == survivedCell:
+                    value = CastData(data[r][k], k)
+                    bucketsY[i].append(value)
+                else:
+                    value = CastData(data[r][k], k)
+            bucketsX[i].append(tup)
+            data.pop(r)
+
+    for i in range(remainder):
+        arrLengthSecond = len(data[0])
+        tup = ()
+        r = random.randint(0, len(data) - 1)
+
+        while r == 0:
+            r = random.randint(0, len(data) - 1)
+
+        for k in range(1, arrLengthSecond):
+            if k == survivedCell:
+                value = CastData(data[r][k], k)
+                bucketsY[i].append(value)
+            else:
+                value = CastData(data[r][k], k)
+        bucketsX[i].append(tup)
+        data.pop(r)
+
+    for i in range(crossValidation):
+        x_Train.clear()
+        y_Train.clear()
+
+        for j in range(crossValidation):
+            if i == j:
+                x_Test = bucketsX[j]
+                y_Test = bucketsY[j]
+            else:
+                x_Train.extend(bucketsX[j])
+                y_Train.extend(bucketsY[j])
+        TrainWithXGBoost(x_Train, x_Test, y_Train, y_Test)
+        print("Das war dieser Durchlauf: " + str(i))
+
+
+def TrainWithNeuralNetwork(x_Train, x_Test, y_Train, y_Test):
     import tensorflow as tf
 
     x_train_tf = tf.constant(x_Train)
@@ -165,15 +223,15 @@ def TrainWithNeuralNetwork():
     print('Test accuracy:', accuracy)
 
 
-def TrainWithXGBoost():
+def TrainWithXGBoost(x_Train, x_Test, y_Train, y_Test):
 
     global bst
-    bst = XGBClassifier(n_estimators=35000, max_depth=8,
+    bst = XGBClassifier(n_estimators=350, max_depth=8,
                         learning_rate=0.00025, objective='binary:logistic', subsample=0.3)
 
     eval_set = [(x_Train, y_Train), (x_Test, y_Test)]
     bst.fit(x_Train, y_Train,
-            eval_set=eval_set, verbose=True)
+            eval_set=eval_set, verbose=False)
 
     y_predictions = bst.predict(x_Test)
     y_pred = [round(value) for value in y_predictions]
@@ -215,12 +273,14 @@ def ResultToCSV(result):
 
 
 rf.GetData()
-x, y = SplitIntoXandY(rf.csvTrain)
+
+CrossValidation(rf.csvTrain)
+'''x, y = SplitIntoXandY(rf.csvTrain)
 x_Train, x_Test, y_Train, y_Test = SplitIntoTrainAndValidation(x, y, testSize)
 
 print("Beginnt lernen")
-TrainWithXGBoost()
+TrainWithXGBoost(x_Train, x_Test, y_Train, y_Test)
 
 x_Predict = ConvertDataToList(rf.csvTest)
 result = PredictWithXGBoost()
-ResultToCSV(result)
+ResultToCSV(result)'''
