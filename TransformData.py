@@ -17,7 +17,6 @@ crossValidation = 5
 
 
 class Category(IntEnum):
-    Survived = 1
     Pclass = 2
     Name = 3
     Sex = 4
@@ -30,29 +29,43 @@ class Category(IntEnum):
     Embarked = 11
 
 
-class Embarked(IntEnum):
-    C = 0
-    Q = 1
-    S = 2
-
-
-class Sex(IntEnum):
-    male = 0
-    female = 1
-
-
 def CastData(data, column):
     column = Category(column)
     match column:
+        case Category.Pclass:
+            match int(data):
+                case 1:
+                    return (1, 0, 0,)
+                case 2:
+                    return (0, 1, 0,)
+                case 3:
+                    return (0, 0, 1,)
         case Category.Name:
-            data = zlib.crc32(data.encode()) & 0xffffffff
+            data = data.lower()
+            if "mr." in data:
+                return (1, 0, 0, 0, 0, 0,)
+            elif "dr." in data:
+                return (0, 1, 0, 0, 0, 0,)
+            elif "master." in data:
+                return (0, 0, 1, 0, 0, 0,)
+            elif "mrs." in data:
+                return (0, 0, 0, 1, 0, 0,)
+            elif "miss." in data:
+                return (0, 0, 0, 0, 1, 0,)
+            elif "ms." in data:
+                return (0, 0, 0, 0, 0, 1,)
+            else:
+                K = 456
         case Category.Sex:
-            data = Sex[data]
+            if data == "male":
+                return (1, 0)
+            else:
+                return (0, 1)
         case Category.Age:
-            try:
-                data = float(data)
-            except:
-                data = 0.0
+            if data != "":
+                return (np.float64(data),)
+            else:
+                return (None,)
         case Category.Ticket:
             data = zlib.crc32(data.encode()) & 0xffffffff
         case Category.Fare:
@@ -60,11 +73,20 @@ def CastData(data, column):
         case Category.Cabin:
             data = zlib.crc32(data.encode()) & 0xffffffff
         case Category.Embarked:
-            try:
-                data = Embarked[data]
-            except:
-                data = 0.0
-    return (np.float64(float(data)),)
+            if data == "S":
+                return (1, 0, 0, 0,)
+            elif data == "Q":
+                return (0, 1, 0, 0,)
+            elif data == "C":
+                return (0, 0, 1, 0,)
+            else:
+                return (0, 0, 0, 1,)
+    try:
+        x = np.float64(float(data))
+        return (x,)
+    except:
+        print(data)
+        k = 546
 
 
 def SplitIntoXandY(data):
@@ -219,7 +241,6 @@ def TrainWithXGBoost(x_Train, x_Test, y_Train, y_Test):
 
     global bst
 
-
     bst = XGBClassifier(n_estimators=50, max_depth=8,
                         learning_rate=0.00025, objective='binary:logistic', subsample=0.3)
 
@@ -238,6 +259,7 @@ def TrainWithXGBoost(x_Train, x_Test, y_Train, y_Test):
             rightPredicts += 1
 
     print("Score: " + str(rightPredicts / arrLength))
+    return rightPredicts / arrLength
 
 
 def PredictWithXGBoost():
