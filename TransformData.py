@@ -43,24 +43,32 @@ def CastData(data, column):
         case Category.Name:
             data = data.lower()
             if "mr." in data:
-                return (1, 0, 0, 0, 0, 0,)
+                return (1, 0, 0, 0, 0, 0, 0, 0, 0, 0,)
+            elif "major." in data or "col." in data or "capt." in data:
+                return (0, 1, 0, 0, 0, 0, 0, 0, 0, 0,)
+            elif "rev." in data:
+                return (0, 0, 1, 0, 0, 0, 0, 0, 0, 0,)
+            elif "sir." in data or "don." in data or "jonkheer." in data:
+                return (0, 0, 0, 1, 0, 0, 0, 0, 0, 0,)
             elif "dr." in data:
-                return (0, 1, 0, 0, 0, 0,)
+                return (0, 0, 0, 0, 1, 0, 0, 0, 0, 0,)
             elif "master." in data:
-                return (0, 0, 1, 0, 0, 0,)
-            elif "mrs." in data:
-                return (0, 0, 0, 1, 0, 0,)
-            elif "miss." in data:
-                return (0, 0, 0, 0, 1, 0,)
+                return (0, 0, 0, 0, 0, 1, 0, 0, 0, 0,)
+            elif "mrs." in data or "mme." in data or "lady." in data or "dona." in data:
+                return (0, 0, 0, 0, 0, 0, 1, 0, 0, 0,)
+            elif "miss." in data or "mlle." in data:
+                return (0, 0, 0, 0, 0, 0, 0, 1, 0, 0,)
             elif "ms." in data:
-                return (0, 0, 0, 0, 0, 1,)
+                return (0, 0, 0, 0, 0, 0, 0, 0, 1, 0,)
+            elif "countess." in data:
+                return (0, 0, 0, 0, 0, 0, 0, 0, 0, 1,)
             else:
                 K = 456
         case Category.Sex:
             if data == "male":
-                return (1, 0)
+                return (1, 0,)
             else:
-                return (0, 1)
+                return (0, 1,)
         case Category.Age:
             if data != "":
                 return (np.float64(data),)
