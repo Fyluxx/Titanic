@@ -13,7 +13,7 @@ import csv
 survivedCell = 1
 batch_size = 50
 testSize = 0.01
-crossValidation = 5
+crossValidation = 6
 
 
 class Category(IntEnum):
@@ -70,10 +70,14 @@ def CastData(data, column):
             else:
                 return (0, 1,)
         case Category.Age:
-            if data != "":
-                return (np.float64(data),)
+            if data == "":
+                return (0, 0,)
             else:
-                return (None,)
+                if float(data) < 18:
+                    return (float(data), 1,)
+                else:
+                    return (float(data), 0,)
+
         case Category.Ticket:
             data = zlib.crc32(data.encode()) & 0xffffffff
         case Category.Fare:
@@ -95,6 +99,7 @@ def CastData(data, column):
     except:
         print(data)
         k = 546
+        raise
 
 
 def SplitIntoXandY(data):
@@ -249,8 +254,8 @@ def TrainWithXGBoost(x_Train, x_Test, y_Train, y_Test):
 
     global bst
 
-    bst = XGBClassifier(n_estimators=50, max_depth=8,
-                        learning_rate=0.00025, objective='binary:logistic', subsample=0.3)
+    bst = XGBClassifier(n_estimators=1000, max_depth=12,
+                        learning_rate=0.0001, objective='binary:logistic', subsample=0.25)
 
     eval_set = [(x_Train, y_Train), (x_Test, y_Test)]
     bst.fit(x_Train, y_Train,
@@ -304,5 +309,5 @@ x_Train, x_Test, y_Train, y_Test = SplitIntoTrainAndValidation(x, y, testSize)
 # TrainWithXGBoost(x_Train, x_Test, y_Train, y_Test)
 
 x_Predict = ConvertDataToList(rf.csvTest)
-# result = PredictWithXGBoost()
-# ResultToCSV(result)
+result = PredictWithXGBoost()
+ResultToCSV(result)
