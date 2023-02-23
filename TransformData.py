@@ -14,6 +14,7 @@ survivedCell = 1
 batch_size = 50
 testSize = 0.01
 crossValidation = 6
+bst = []
 
 
 class Category(IntEnum):
@@ -62,8 +63,6 @@ def CastData(data, column):
                 return (0, 0, 0, 0, 0, 0, 0, 0, 1, 0,)
             elif "countess." in data:
                 return (0, 0, 0, 0, 0, 0, 0, 0, 0, 1,)
-            else:
-                K = 456
         case Category.Sex:
             if data == "male":
                 return (1, 0,)
@@ -71,28 +70,66 @@ def CastData(data, column):
                 return (0, 1,)
         case Category.Age:
             if data == "":
-                return (0, 0,)
+                return (None, None, 0)
             else:
                 if float(data) < 18:
-                    return (float(data), 1,)
+                    return (float(data), 1, 1)
                 else:
-                    return (float(data), 0,)
+                    return (float(data), 0, 1)
 
         case Category.Ticket:
-            data = zlib.crc32(data.encode()) & 0xffffffff
+            return (None,)
         case Category.Fare:
-            data = zlib.crc32(data.encode()) & 0xffffffff
+            if data == "":
+                return (None, 0,)
+            else:
+                return (float(data), 1,)
         case Category.Cabin:
-            data = zlib.crc32(data.encode()) & 0xffffffff
+            data = data.lower()
+            if "a" in data:
+                return (1, 0, 0, 0, 0, 0, 0, 1,)
+            elif "b" in data:
+                return (0, 1, 0, 0, 0, 0, 0, 1,)
+            elif "c" in data:
+                return (0, 0, 1, 0, 0, 0, 0, 1,)
+            elif "d" in data:
+                return (0, 0, 0, 1, 0, 0, 0, 1,)
+            elif "e" in data:
+                return (0, 0, 0, 0, 1, 0, 0, 1,)
+            elif "f" in data:
+                return (0, 0, 0, 0, 0, 1, 0, 1,)
+            elif "g" in data:
+                return (0, 0, 0, 0, 0, 0, 1, 1,)
+            else:
+                return (0, 0, 0, 0, 0, 0, 0, 0,)
+
         case Category.Embarked:
             if data == "S":
-                return (1, 0, 0, 0,)
+                return (1, 0, 0, 1,)
             elif data == "Q":
-                return (0, 1, 0, 0,)
+                return (0, 1, 0, 1,)
             elif data == "C":
-                return (0, 0, 1, 0,)
+                return (0, 0, 1, 1,)
             else:
-                return (0, 0, 0, 1,)
+                return (0, 0, 0, 0,)
+        case Category.SibSp:
+            data = int(data)
+
+            match data:
+                case 0:
+                    return (1, 0, 0, 0, 0, 0, 0,)
+                case 1:
+                    return (0, 1, 0, 0, 0, 0, 0,)
+                case 2:
+                    return (0, 0, 1, 0, 0, 0, 0,)
+                case 3:
+                    return (0, 0, 0, 1, 0, 0, 0,)
+                case 4:
+                    return (0, 0, 0, 0, 1, 0, 0,)
+                case 5:
+                    return (0, 0, 0, 0, 0, 1, 0,)
+                case 8:
+                    return (0, 0, 0, 0, 0, 0, 1,)
     try:
         x = np.float64(float(data))
         return (x,)
@@ -199,6 +236,11 @@ def CrossValidation(data):
         bucketsX[i].append(tup)
         data.pop(r)
 
+    sum = 0.0
+    global bestModel
+    bestModel = 0
+    bestValue, currentValue = 0, 0
+
     for i in range(crossValidation):
         x_Train.clear()
         y_Train.clear()
@@ -211,7 +253,14 @@ def CrossValidation(data):
                 x_Train.extend(bucketsX[j])
                 y_Train.extend(bucketsY[j])
         print("Durchlauf: " + str(i + 1))
-        TrainWithXGBoost(x_Train, x_Test, y_Train, y_Test)
+        currentValue = TrainWithXGBoost(x_Train, x_Test, y_Train, y_Test)
+        sum += currentValue
+
+        if currentValue > bestValue:
+            bestValue = currentValue
+            bestModel = i
+
+    print("Average Score: " + str(sum/crossValidation))
 
 
 def TrainWithNeuralNetwork(x_Train, x_Test, y_Train, y_Test):
@@ -251,17 +300,14 @@ def TrainWithNeuralNetwork(x_Train, x_Test, y_Train, y_Test):
 
 
 def TrainWithXGBoost(x_Train, x_Test, y_Train, y_Test):
-
-    global bst
-
-    bst = XGBClassifier(n_estimators=1000, max_depth=12,
-                        learning_rate=0.0001, objective='binary:logistic', subsample=0.25)
+    bst.append(XGBClassifier(n_estimators=10000, max_depth=12,
+                             learning_rate=0.0001, objective='binary:logistic', subsample=0.3, random_state=42, early_stopping_rounds=20))
 
     eval_set = [(x_Train, y_Train), (x_Test, y_Test)]
-    bst.fit(x_Train, y_Train,
-            eval_set=eval_set, verbose=False)
+    bst[len(bst) - 1].fit(x_Train, y_Train,
+                          eval_set=eval_set, verbose=False)
 
-    y_predictions = bst.predict(x_Test)
+    y_predictions = bst[len(bst) - 1].predict(x_Test)
     y_pred = [round(value) for value in y_predictions]
 
     rightPredicts = 0
@@ -276,7 +322,7 @@ def TrainWithXGBoost(x_Train, x_Test, y_Train, y_Test):
 
 
 def PredictWithXGBoost():
-    y_predictions = bst.predict(x_Predict)
+    y_predictions = bst[bestModel].predict(x_Predict)
     y_pred = [round(value) for value in y_predictions]
     return y_pred
 
