@@ -64,7 +64,7 @@ def CastData(data, column):
                 data = Embarked[data]
             except:
                 data = 0.0
-    return np.float64(float(data))
+    return (np.float64(float(data)),)
 
 
 def SplitIntoXandY(data):
@@ -78,13 +78,9 @@ def SplitIntoXandY(data):
         tup = ()
         for j in range(1, arrLengthSecond):
             if j == survivedCell:
-                value = data[i][j]
-                value = CastData(value, j)
-                y.append(value)
+                y.append(float(data[i][j]))
             else:
-                value = data[i][j]
-                value = CastData(value, j)
-                tup += (value,)
+                tup += CastData(data[i][j], j)
         x.append(tup)
 
     return x, y
@@ -101,9 +97,7 @@ def ConvertDataToList(data):
         tup = ()
         for j in range(1, arrLengthSecond):
             k = j + 1
-            value = data[i][j]
-            value = CastData(value, k)
-            tup += (value,)
+            tup += CastData(data[i][j], k)
         x.append(tup)
     return x
 
@@ -148,11 +142,9 @@ def CrossValidation(data):
 
             for k in range(1, arrLengthSecond):
                 if k == survivedCell:
-                    value = CastData(data[r][k], k)
-                    bucketsY[i].append(value)
+                    bucketsY[i].append(float(data[r][k]))
                 else:
-                    value = CastData(data[r][k], k)
-                    tup += (value,)
+                    tup += CastData(data[r][k], k)
             bucketsX[i].append(tup)
             data.pop(r)
 
@@ -166,11 +158,9 @@ def CrossValidation(data):
 
         for k in range(1, arrLengthSecond):
             if k == survivedCell:
-                value = CastData(data[r][k], k)
-                bucketsY[i].append(value)
+                bucketsY[i].append(float(data[r][k]))
             else:
-                value = CastData(data[r][k], k)
-                tup += (value,)
+                tup += CastData(data[r][k], k)
         bucketsX[i].append(tup)
         data.pop(r)
 
@@ -228,6 +218,8 @@ def TrainWithNeuralNetwork(x_Train, x_Test, y_Train, y_Test):
 def TrainWithXGBoost(x_Train, x_Test, y_Train, y_Test):
 
     global bst
+
+
     bst = XGBClassifier(n_estimators=50, max_depth=8,
                         learning_rate=0.00025, objective='binary:logistic', subsample=0.3)
 
@@ -275,12 +267,12 @@ def ResultToCSV(result):
 rf.GetData()
 
 CrossValidation(rf.csvTrain)
-'''x, y = SplitIntoXandY(rf.csvTrain)
+x, y = SplitIntoXandY(rf.csvTrain)
 x_Train, x_Test, y_Train, y_Test = SplitIntoTrainAndValidation(x, y, testSize)
 
-print("Beginnt lernen")
-TrainWithXGBoost(x_Train, x_Test, y_Train, y_Test)
+# print("Beginnt lernen")
+# TrainWithXGBoost(x_Train, x_Test, y_Train, y_Test)
 
 x_Predict = ConvertDataToList(rf.csvTest)
-result = PredictWithXGBoost()
-ResultToCSV(result)'''
+# result = PredictWithXGBoost()
+# ResultToCSV(result)
