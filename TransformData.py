@@ -319,8 +319,8 @@ def TrainWithNeuralNetwork(x_Train, x_Test, y_Train, y_Test):
 
 
 def TrainWithXGBoost(x_Train, x_Test, y_Train, y_Test):
-    bst.append(XGBClassifier(n_estimators=100, max_depth=14,
-                             learning_rate=0.0006, objective='binary:logistic', subsample=0.3, random_state=42, early_stopping_rounds=35))
+    bst.append(XGBClassifier(n_estimators=10000, max_depth=8, min_child_weight=10,
+                             learning_rate=0.01, objective='binary:logistic', subsample=0.3, random_state=42, early_stopping_rounds=16))
 
     eval_set = [(x_Train, y_Train), (x_Test, y_Test)]
     bst[len(bst) - 1].fit(x_Train, y_Train,
