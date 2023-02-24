@@ -12,8 +12,8 @@ import csv
 
 survivedCell = 1
 batch_size = 50
-testSize = 0.02
-crossValidation = 9
+testSize = 0.2
+crossValidation = 5
 bst = []
 result = []
 bestModel = 0
@@ -88,19 +88,17 @@ def CastData(data, column):
             return (None,)
         case Category.Fare:
             if data == "":
-                return (None, 0, 0, 0, 0, 0, 0, 0,)
-            elif float(data) < 8:
-                return (float(data), 1, 0, 0, 0, 0, 0, 0,)
-            elif float(data) > 300:
-                return (float(data), 0, 1, 0, 0, 0, 0, 0,)
-            elif float(data) < 15:
-                return (float(data), 0, 0, 1, 0, 0, 0, 0,)
-            elif float(data) < 30:
-                return (float(data), 0, 0, 0, 1, 0, 0, 0,)
+                return (None, 0, 0, 0, 0, 0,)
+            elif float(data) < 10:
+                return (float(data), 1, 0, 0, 0, 0,)
+            elif float(data) < 25:
+                return (float(data), 0, 1, 0, 0, 0,)
+            elif float(data) < 50:
+                return (float(data), 0, 0, 1, 0, 0,)
             elif float(data) < 100:
-                return (float(data), 0, 0, 0, 0, 1, 0, 0,)
+                return (float(data), 0, 0, 0, 1, 0,)
             else:
-                return (float(data), 0, 0, 0, 0, 0, 0, 1,)
+                return (float(data), 0, 0, 0, 0, 1,)
         case Category.Cabin:
             data = data.lower()
             if "a" in data:
@@ -277,18 +275,8 @@ def CrossValidation(data):
 
     print("Average Score: " + str(sum/crossValidation)),
 
-    counter = 0
-    co = 0
-
     for i in range(crossValidation):
         result.append(PredictWithXGBoost(i))
-
-    for i in range(len(result[0])):
-        if result[0][i] != result[1][i] or result[0][i] != result[2][i] or result[0][i] != result[3][i] or result[0][i] != result[4][i]:
-            counter += 1
-        else:
-            co += 1
-    print("Verhältnis gleich und ungleich: " + str(counter / co))
 
     res = AveragePredict()
     ResultToCSV(res)
@@ -332,7 +320,7 @@ def TrainWithNeuralNetwork(x_Train, x_Test, y_Train, y_Test):
 
 def TrainWithXGBoost(x_Train, x_Test, y_Train, y_Test):
     bst.append(XGBClassifier(n_estimators=10000, max_depth=14,
-                             learning_rate=0.00006, objective='binary:logistic', subsample=0.3, random_state=42, early_stopping_rounds=35))
+                             learning_rate=0.0006, objective='binary:logistic', subsample=0.3, random_state=42, early_stopping_rounds=35))
 
     eval_set = [(x_Train, y_Train), (x_Test, y_Test)]
     bst[len(bst) - 1].fit(x_Train, y_Train,
