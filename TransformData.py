@@ -13,7 +13,7 @@ import csv
 survivedCell = 1
 batch_size = 50
 testSize = 0.02
-crossValidation = 5
+crossValidation = 9
 bst = []
 result = []
 bestModel = 0
@@ -45,11 +45,7 @@ def CastData(data, column):
                     return (0, 0, 1,)
         case Category.Name:
             data = data.lower()
-            if "lady." in data or "countess." in data or "capt." in data or  "col." in data or "don." in data or \
-                "dr." in data or "major." in data or "rev." in data or "sir." in data or "jonkheer."
-            
-            
-            
+
             if "mr." in data:
                 return (1, 0, 0, 0, 0, 0, 0, 0, 0, 0,)
             elif "major." in data or "col." in data or "capt." in data:
@@ -92,9 +88,19 @@ def CastData(data, column):
             return (None,)
         case Category.Fare:
             if data == "":
-                return (None, 0,)
+                return (None, 0, 0, 0, 0, 0, 0, 0,)
+            elif float(data) < 8:
+                return (float(data), 1, 0, 0, 0, 0, 0, 0,)
+            elif float(data) > 300:
+                return (float(data), 0, 1, 0, 0, 0, 0, 0,)
+            elif float(data) < 15:
+                return (float(data), 0, 0, 1, 0, 0, 0, 0,)
+            elif float(data) < 30:
+                return (float(data), 0, 0, 0, 1, 0, 0, 0,)
+            elif float(data) < 100:
+                return (float(data), 0, 0, 0, 0, 1, 0, 0,)
             else:
-                return (float(data), 1,)
+                return (float(data), 0, 0, 0, 0, 0, 0, 1,)
         case Category.Cabin:
             data = data.lower()
             if "a" in data:
