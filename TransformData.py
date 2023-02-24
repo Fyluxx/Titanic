@@ -12,9 +12,11 @@ import csv
 
 survivedCell = 1
 batch_size = 50
-testSize = 0.01
-crossValidation = 6
+testSize = 0.02
+crossValidation = 5
 bst = []
+result = []
+bestModel = 0
 
 
 class Category(IntEnum):
@@ -43,6 +45,11 @@ def CastData(data, column):
                     return (0, 0, 1,)
         case Category.Name:
             data = data.lower()
+            if "lady." in data or "countess." in data or "capt." in data or  "col." in data or "don." in data or \
+                "dr." in data or "major." in data or "rev." in data or "sir." in data or "jonkheer."
+            
+            
+            
             if "mr." in data:
                 return (1, 0, 0, 0, 0, 0, 0, 0, 0, 0,)
             elif "major." in data or "col." in data or "capt." in data:
@@ -70,12 +77,16 @@ def CastData(data, column):
                 return (0, 1,)
         case Category.Age:
             if data == "":
-                return (None, None, 0)
+                return (None, 0, 0, 0, 0, 0)
             else:
                 if float(data) < 18:
-                    return (float(data), 1, 1)
+                    return (float(data), 1, 0, 0, 0, 1)
+                elif float(data) > 50:
+                    return (float(data), 0, 1, 0, 0, 1)
+                elif float(data) < 30:
+                    return (float(data), 0, 0, 1, 0, 1)
                 else:
-                    return (float(data), 0, 1)
+                    return (float(data), 0, 0, 0, 1, 1)
 
         case Category.Ticket:
             return (None,)
@@ -237,8 +248,6 @@ def CrossValidation(data):
         data.pop(r)
 
     sum = 0.0
-    global bestModel
-    bestModel = 0
     bestValue, currentValue = 0, 0
 
     for i in range(crossValidation):
@@ -260,7 +269,23 @@ def CrossValidation(data):
             bestValue = currentValue
             bestModel = i
 
-    print("Average Score: " + str(sum/crossValidation))
+    print("Average Score: " + str(sum/crossValidation)),
+
+    counter = 0
+    co = 0
+
+    for i in range(crossValidation):
+        result.append(PredictWithXGBoost(i))
+
+    for i in range(len(result[0])):
+        if result[0][i] != result[1][i] or result[0][i] != result[2][i] or result[0][i] != result[3][i] or result[0][i] != result[4][i]:
+            counter += 1
+        else:
+            co += 1
+    print("Verhältnis gleich und ungleich: " + str(counter / co))
+
+    res = AveragePredict()
+    ResultToCSV(res)
 
 
 def TrainWithNeuralNetwork(x_Train, x_Test, y_Train, y_Test):
@@ -300,8 +325,8 @@ def TrainWithNeuralNetwork(x_Train, x_Test, y_Train, y_Test):
 
 
 def TrainWithXGBoost(x_Train, x_Test, y_Train, y_Test):
-    bst.append(XGBClassifier(n_estimators=10000, max_depth=12,
-                             learning_rate=0.0001, objective='binary:logistic', subsample=0.3, random_state=42, early_stopping_rounds=20))
+    bst.append(XGBClassifier(n_estimators=10000, max_depth=14,
+                             learning_rate=0.00006, objective='binary:logistic', subsample=0.3, random_state=42, early_stopping_rounds=35))
 
     eval_set = [(x_Train, y_Train), (x_Test, y_Test)]
     bst[len(bst) - 1].fit(x_Train, y_Train,
@@ -321,10 +346,27 @@ def TrainWithXGBoost(x_Train, x_Test, y_Train, y_Test):
     return rightPredicts / arrLength
 
 
-def PredictWithXGBoost():
-    y_predictions = bst[bestModel].predict(x_Predict)
+def PredictWithXGBoost(model):
+    y_predictions = bst[model].predict(x_Predict)
     y_pred = [round(value) for value in y_predictions]
     return y_pred
+
+
+def AveragePredict():
+    res = []
+
+    for i in range(len(result[0])):
+        count0, count1 = 0, 0
+        for j in range(len(result)):
+            if result[j][i] == 0:
+                count0 += 1
+            else:
+                count1 += 1
+        if (count0 > count1):
+            res.append(0)
+        else:
+            res.append(1)
+    return res
 
 
 def ResultToCSV(result):
@@ -346,14 +388,12 @@ def ResultToCSV(result):
 
 
 rf.GetData()
+x_Predict = ConvertDataToList(rf.csvTest)
 
 CrossValidation(rf.csvTrain)
 x, y = SplitIntoXandY(rf.csvTrain)
 x_Train, x_Test, y_Train, y_Test = SplitIntoTrainAndValidation(x, y, testSize)
 
-# print("Beginnt lernen")
 # TrainWithXGBoost(x_Train, x_Test, y_Train, y_Test)
 
-x_Predict = ConvertDataToList(rf.csvTest)
-result = PredictWithXGBoost()
-ResultToCSV(result)
+# ResultToCSV(result)
