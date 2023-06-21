@@ -38,39 +38,167 @@ def CastData(data, column):
         case Category.Pclass:
             match int(data):
                 case 1:
-                    return (1, 0, 0,)
+                    return (
+                        1,
+                        0,
+                        0,
+                    )
                 case 2:
-                    return (0, 1, 0,)
+                    return (
+                        0,
+                        1,
+                        0,
+                    )
                 case 3:
-                    return (0, 0, 1,)
+                    return (
+                        0,
+                        0,
+                        1,
+                    )
         case Category.Name:
             data = data.lower()
 
             if "mr." in data:
-                return (1, 0, 0, 0, 0, 0, 0, 0, 0, 0,)
+                return (
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                )
             elif "major." in data or "col." in data or "capt." in data:
-                return (0, 1, 0, 0, 0, 0, 0, 0, 0, 0,)
+                return (
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                )
             elif "rev." in data:
-                return (0, 0, 1, 0, 0, 0, 0, 0, 0, 0,)
+                return (
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                )
             elif "sir." in data or "don." in data or "jonkheer." in data:
-                return (0, 0, 0, 1, 0, 0, 0, 0, 0, 0,)
+                return (
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                )
             elif "dr." in data:
-                return (0, 0, 0, 0, 1, 0, 0, 0, 0, 0,)
+                return (
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                )
             elif "master." in data:
-                return (0, 0, 0, 0, 0, 1, 0, 0, 0, 0,)
+                return (
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                )
             elif "mrs." in data or "mme." in data or "lady." in data or "dona." in data:
-                return (0, 0, 0, 0, 0, 0, 1, 0, 0, 0,)
+                return (
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                )
             elif "miss." in data or "mlle." in data:
-                return (0, 0, 0, 0, 0, 0, 0, 1, 0, 0,)
+                return (
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                )
             elif "ms." in data:
-                return (0, 0, 0, 0, 0, 0, 0, 0, 1, 0,)
+                return (
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                )
             elif "countess." in data:
-                return (0, 0, 0, 0, 0, 0, 0, 0, 0, 1,)
+                return (
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                )
         case Category.Sex:
             if data == "male":
-                return (1, 0,)
+                return (
+                    1,
+                    0,
+                )
             else:
-                return (0, 1,)
+                return (
+                    0,
+                    1,
+                )
         case Category.Age:
             if data == "":
                 return (None, 0, 0, 0, 0, 0)
@@ -88,63 +216,253 @@ def CastData(data, column):
             return (None,)
         case Category.Fare:
             if data == "":
-                return (None, 0, 0, 0, 0, 0,)
+                return (
+                    None,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                )
             elif float(data) < 10:
-                return (float(data), 1, 0, 0, 0, 0,)
+                return (
+                    float(data),
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                )
             elif float(data) < 25:
-                return (float(data), 0, 1, 0, 0, 0,)
+                return (
+                    float(data),
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                )
             elif float(data) < 50:
-                return (float(data), 0, 0, 1, 0, 0,)
+                return (
+                    float(data),
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                )
             elif float(data) < 100:
-                return (float(data), 0, 0, 0, 1, 0,)
+                return (
+                    float(data),
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                )
             else:
-                return (float(data), 0, 0, 0, 0, 1,)
+                return (
+                    float(data),
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                )
         case Category.Cabin:
             data = data.lower()
             if "a" in data:
-                return (1, 0, 0, 0, 0, 0, 0, 1,)
+                return (
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                )
             elif "b" in data:
-                return (0, 1, 0, 0, 0, 0, 0, 1,)
+                return (
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                )
             elif "c" in data:
-                return (0, 0, 1, 0, 0, 0, 0, 1,)
+                return (
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                )
             elif "d" in data:
-                return (0, 0, 0, 1, 0, 0, 0, 1,)
+                return (
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    0,
+                    1,
+                )
             elif "e" in data:
-                return (0, 0, 0, 0, 1, 0, 0, 1,)
+                return (
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    0,
+                    1,
+                )
             elif "f" in data:
-                return (0, 0, 0, 0, 0, 1, 0, 1,)
+                return (
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    0,
+                    1,
+                )
             elif "g" in data:
-                return (0, 0, 0, 0, 0, 0, 1, 1,)
+                return (
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    1,
+                )
             else:
-                return (0, 0, 0, 0, 0, 0, 0, 0,)
+                return (
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                )
 
         case Category.Embarked:
             if data == "S":
-                return (1, 0, 0, 1,)
+                return (
+                    1,
+                    0,
+                    0,
+                    1,
+                )
             elif data == "Q":
-                return (0, 1, 0, 1,)
+                return (
+                    0,
+                    1,
+                    0,
+                    1,
+                )
             elif data == "C":
-                return (0, 0, 1, 1,)
+                return (
+                    0,
+                    0,
+                    1,
+                    1,
+                )
             else:
-                return (0, 0, 0, 0,)
+                return (
+                    0,
+                    0,
+                    0,
+                    0,
+                )
         case Category.SibSp:
             data = int(data)
 
             match data:
                 case 0:
-                    return (1, 0, 0, 0, 0, 0, 0,)
+                    return (
+                        1,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                    )
                 case 1:
-                    return (0, 1, 0, 0, 0, 0, 0,)
+                    return (
+                        0,
+                        1,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                    )
                 case 2:
-                    return (0, 0, 1, 0, 0, 0, 0,)
+                    return (
+                        0,
+                        0,
+                        1,
+                        0,
+                        0,
+                        0,
+                        0,
+                    )
                 case 3:
-                    return (0, 0, 0, 1, 0, 0, 0,)
+                    return (
+                        0,
+                        0,
+                        0,
+                        1,
+                        0,
+                        0,
+                        0,
+                    )
                 case 4:
-                    return (0, 0, 0, 0, 1, 0, 0,)
+                    return (
+                        0,
+                        0,
+                        0,
+                        0,
+                        1,
+                        0,
+                        0,
+                    )
                 case 5:
-                    return (0, 0, 0, 0, 0, 1, 0,)
+                    return (
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        1,
+                        0,
+                    )
                 case 8:
-                    return (0, 0, 0, 0, 0, 0, 1,)
+                    return (
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        1,
+                    )
     try:
         x = np.float64(float(data))
         return (x,)
@@ -273,7 +591,7 @@ def CrossValidation(data):
             bestValue = currentValue
             bestModel = i
 
-    print("Average Score: " + str(sum/crossValidation)),
+    print("Average Score: " + str(sum / crossValidation)),
 
     for i in range(crossValidation):
         result.append(PredictWithXGBoost(i))
@@ -300,31 +618,38 @@ def TrainWithNeuralNetwork(x_Train, x_Test, y_Train, y_Test):
     test_ds = test_ds.batch(batch_size)
     regulation = tf.keras.regularizers.l2(0.01)
 
-    model = tf.keras.models.Sequential([
-        tf.keras.layers.Dense(64, activation='relu',
-                              kernel_regularizer=regulation),
-        tf.keras.layers.Dropout(0.3),
-        tf.keras.layers.Dense(16, activation='relu',
-                              kernel_regularizer=regulation),
-        tf.keras.layers.Dense(1, activation='sigmoid')
-    ])
+    model = tf.keras.models.Sequential(
+        [
+            tf.keras.layers.Dense(64, activation="relu", kernel_regularizer=regulation),
+            tf.keras.layers.Dropout(0.3),
+            tf.keras.layers.Dense(16, activation="relu", kernel_regularizer=regulation),
+            tf.keras.layers.Dense(1, activation="sigmoid"),
+        ]
+    )
 
-    model.compile(optimizer='adam',
-                  loss='binary_crossentropy',
-                  metrics=['accuracy'])
+    model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])
     model.fit(train_ds, epochs=1500, validation_data=test_ds, verbose=1)
 
     loss, accuracy = model.evaluate(x_Test, y_Test)
-    print('Test accuracy:', accuracy)
+    print("Test accuracy:", accuracy)
 
 
 def TrainWithXGBoost(x_Train, x_Test, y_Train, y_Test):
-    bst.append(XGBClassifier(n_estimators=10000, max_depth=8, min_child_weight=10,
-                             learning_rate=0.01, objective='binary:logistic', subsample=0.3, random_state=42, early_stopping_rounds=16))
+    bst.append(
+        XGBClassifier(
+            n_estimators=10000,
+            max_depth=8,
+            min_child_weight=10,
+            learning_rate=0.01,
+            objective="binary:logistic",
+            subsample=0.3,
+            random_state=42,
+            early_stopping_rounds=16,
+        )
+    )
 
     eval_set = [(x_Train, y_Train), (x_Test, y_Test)]
-    bst[len(bst) - 1].fit(x_Train, y_Train,
-                          eval_set=eval_set, verbose=False)
+    bst[len(bst) - 1].fit(x_Train, y_Train, eval_set=eval_set, verbose=False)
 
     y_predictions = bst[len(bst) - 1].predict(x_Test)
     y_pred = [round(value) for value in y_predictions]
@@ -356,7 +681,7 @@ def AveragePredict():
                 count0 += 1
             else:
                 count1 += 1
-        if (count0 > count1):
+        if count0 > count1:
             res.append(0)
         else:
             res.append(1)
@@ -374,7 +699,7 @@ def ResultToCSV(result):
 
     itemLength = len(data[0])
 
-    with open('predictions.csv', 'w') as out:
+    with open("predictions.csv", "w") as out:
         csv_out = csv.writer(out, delimiter=",")
         for row in data:
             st = row
