@@ -4,12 +4,13 @@ import os
 
 
 def GetData():
-    with open("Daten/train.csv", "r") as file:
-        global csvTrain
+    csvTrain = []
+    csvTest = []
+    
+    with open(r"C:\Projekte\MLflow\train.csv", "r") as file:
         csvTrain = [tuple(row) for row in list(csv.reader(file))]
 
-    with open("Daten/test.csv", "r") as file:
-        global csvTest
+    with open(r"C:\Projekte\MLflow\test.csv", "r") as file:
         csvTest = [tuple(row) for row in csv.reader(file)]
 
-GetData()
+    return csvTrain, csvTest
