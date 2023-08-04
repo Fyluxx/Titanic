@@ -1,0 +1,16 @@
+artifact_uri: file:///C:/Projekte/MLflow/Titanic-1/mlruns/124751252471136185/16e764181de24bd7ac13d35e815253f0/artifacts
+deleted_time: 1689778219609
+end_time: 1689771095860
+entry_point_name: ''
+experiment_id: '124751252471136185'
+lifecycle_stage: deleted
+run_id: 16e764181de24bd7ac13d35e815253f0
+run_name: funny-bug-12
+run_uuid: 16e764181de24bd7ac13d35e815253f0
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1689771093525
+status: 3
+tags: []
+user_id: Paraboost

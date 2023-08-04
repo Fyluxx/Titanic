@@ -7,13 +7,21 @@
   },
   "python.formatting.provider": "none",
   "cSpell.words": [
+    "autolog",
+    "Bestes",
     "crossentropy",
+    "Daten",
+    "durchgang",
+    "Durchgang",
+    "durchgangs",
     "Durchlauf",
     "jonkheer",
     "keras",
+    "mlflow",
     "Pclass",
     "regularizers",
     "relu",
+    "Starte",
     "Xand",
     "xgboost"
   ]

@@ -1,0 +1,13 @@
+aliases: []
+creation_timestamp: 1690532969869
+current_stage: None
+description: ''
+last_updated_timestamp: 1690532969869
+name: Titanic
+run_id: eee7c835461946c8b076f11782df0307
+run_link: ''
+source: file:///C:/Projekte/MLflow/Titanic-1/mlruns/124751252471136185/eee7c835461946c8b076f11782df0307/artifacts/model
+status: READY
+status_message: null
+user_id: null
+version: 1

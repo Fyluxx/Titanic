@@ -1,0 +1,16 @@
+artifact_uri: file:///C:/Projekte/MLflow/Titanic-1/mlruns/124751252471136185/68493ba189f346faae71fe5a2aec7511/artifacts
+deleted_time: 1689778219616
+end_time: 1689771122815
+entry_point_name: ''
+experiment_id: '124751252471136185'
+lifecycle_stage: deleted
+run_id: 68493ba189f346faae71fe5a2aec7511
+run_name: indecisive-yak-807
+run_uuid: 68493ba189f346faae71fe5a2aec7511
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1689771120560
+status: 3
+tags: []
+user_id: Paraboost

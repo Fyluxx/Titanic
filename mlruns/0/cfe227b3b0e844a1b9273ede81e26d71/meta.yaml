@@ -1,0 +1,15 @@
+artifact_uri: mlflow-artifacts:/0/cfe227b3b0e844a1b9273ede81e26d71/artifacts
+end_time: 1690532839720
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: cfe227b3b0e844a1b9273ede81e26d71
+run_name: XGBoost V2
+run_uuid: cfe227b3b0e844a1b9273ede81e26d71
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1690532821057
+status: 3
+tags: []
+user_id: Paraboost

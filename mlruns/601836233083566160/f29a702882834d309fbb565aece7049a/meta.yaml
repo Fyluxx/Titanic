@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Projekte/MLflow/Titanic-1/mlruns/601836233083566160/f29a702882834d309fbb565aece7049a/artifacts
+end_time: 1690533566856
+entry_point_name: ''
+experiment_id: '601836233083566160'
+lifecycle_stage: active
+run_id: f29a702882834d309fbb565aece7049a
+run_name: XGBoost V3
+run_uuid: f29a702882834d309fbb565aece7049a
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1690533548791
+status: 3
+tags: []
+user_id: Paraboost

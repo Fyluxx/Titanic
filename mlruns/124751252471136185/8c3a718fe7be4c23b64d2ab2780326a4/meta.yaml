@@ -1,0 +1,16 @@
+artifact_uri: file:///C:/Projekte/MLflow/Titanic-1/mlruns/124751252471136185/8c3a718fe7be4c23b64d2ab2780326a4/artifacts
+deleted_time: 1689778219608
+end_time: 1689770828230
+entry_point_name: ''
+experiment_id: '124751252471136185'
+lifecycle_stage: deleted
+run_id: 8c3a718fe7be4c23b64d2ab2780326a4
+run_name: worried-shark-987
+run_uuid: 8c3a718fe7be4c23b64d2ab2780326a4
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1689770825877
+status: 3
+tags: []
+user_id: Paraboost

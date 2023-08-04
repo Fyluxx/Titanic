@@ -1,0 +1,9 @@
+digest: caab779d
+name: validation_0
+profile: '{"features_shape": [713, 48], "features_size": 34224, "features_nbytes":
+  136896}'
+schema: '{"mlflow_tensorspec": {"features": "[{\"type\": \"tensor\", \"tensor-spec\":
+  {\"dtype\": \"float32\", \"shape\": [-1, 48]}}]", "targets": null}}'
+source: '{"tags": {"mlflow.user": "Paraboost", "mlflow.source.name": "C:\\Projekte\\MLflow\\Titanic-1\\TransformData.py",
+  "mlflow.source.type": "LOCAL", "mlflow.source.git.commit": "aaeb5f071ddc7e9f376c4a2d316295e7076d1b79"}}'
+source_type: code
